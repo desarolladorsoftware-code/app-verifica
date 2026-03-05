@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum CertificateStatus {
+  ACTIVO
+  REVOCADO
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Certificate {
+  id            String            @id @default(cuid())
+  code          String            @unique
+  fullName      String
+  documentId    String?
+  program       String
+  startDate     DateTime
+  endDate       DateTime
+  hours         Int
+  institution   String
+  authority     String
+  issueDate     DateTime
+  status        CertificateStatus @default(ACTIVO)
+  observations  String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([code])
+  @@index([status])
+}
+
+model RateLimit {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  count     Int      @default(0)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
