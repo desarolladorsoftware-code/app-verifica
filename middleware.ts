@@ -4,21 +4,26 @@ import { SESSION_COOKIE_NAME, verifySession } from "@/lib/auth";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Público siempre permitido:
-  if (pathname === "/" || pathname.startsWith("/c/") || pathname.startsWith("/api/")) {
-    // OJO: los /api/ protegidos se validan dentro del handler (no en middleware).
+  // rutas públicas
+  if (
+    pathname === "/" ||
+    pathname === "/admin/login" ||
+    pathname.startsWith("/c/") ||
+    pathname.startsWith("/api/")
+  ) {
     return NextResponse.next();
   }
 
-  // Proteger /admin y subrutas
   if (pathname.startsWith("/admin")) {
-    const token = req.cookies.get(SESSION_COOKIE_NAME)?.value || "";
+    const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
+
     if (!token) {
       const url = req.nextUrl.clone();
       url.pathname = "/admin/login";
       url.searchParams.set("next", pathname);
       return NextResponse.redirect(url);
     }
+
     try {
       await verifySession(token);
       return NextResponse.next();
@@ -33,5 +38,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"]
+  matcher: ["/admin/:path*"],
 };
