@@ -15,8 +15,8 @@ function noCacheHeaders() {
 }
 
 async function rateLimitOrThrow(key: string) {
-  const max = Number(process.env.LOGIN_RATE_MAX || 8); // intentos
-  const windowSec = Number(process.env.LOGIN_RATE_WINDOW_SECONDS || 10 * 60); // 10 min
+  const max = Number(process.env.LOGIN_RATE_MAX || 8);
+  const windowSec = Number(process.env.LOGIN_RATE_WINDOW_SECONDS || 10 * 60);
   const now = new Date();
   const resetAt = new Date(now.getTime() + windowSec * 1000);
 
@@ -27,7 +27,6 @@ async function rateLimitOrThrow(key: string) {
     return;
   }
 
-  // si expiró, reinicia
   if (existing.resetAt < now) {
     await prisma.rateLimit.update({
       where: { key },
@@ -36,7 +35,6 @@ async function rateLimitOrThrow(key: string) {
     return;
   }
 
-  // si no expiró, incrementa y valida
   if (existing.count + 1 > max) {
     throw new Error("RATE_LIMIT");
   }
@@ -70,7 +68,7 @@ export async function POST(req: Request) {
 
   try {
     await rateLimitOrThrow(key);
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { ok: false, error: "Demasiados intentos. Intenta más tarde." },
       { status: 429, headers: noCacheHeaders() }
@@ -102,12 +100,14 @@ export async function POST(req: Request) {
   }
 
   const token = await signSession({ sub: admin.id, email: admin.email });
-  // set cookie
   setSessionCookie(token);
 
-  // Si vino como form desde /admin/login, redirige
   if (!ct.includes("application/json")) {
-    const url = new URL(next, req.url);
+    const baseUrl = process.env.BASE_URL || "https://verifica.cedull.edu.pe";
+    const safeNext =
+      next && next.startsWith("/") && !next.startsWith("//") ? next : "/admin";
+
+    const url = new URL(safeNext, baseUrl);
     return NextResponse.redirect(url, { headers: noCacheHeaders() });
   }
 
