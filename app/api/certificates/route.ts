@@ -27,16 +27,21 @@ export async function GET(req: Request) {
     });
     return NextResponse.json({ ok: true, items }, { headers: noStore() });
   } catch {
-    return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401, headers: noStore() });
+    return NextResponse.json(
+      { ok: false, error: "No autorizado" },
+      { status: 401, headers: noStore() }
+    );
   }
 }
 
 export async function POST(req: Request) {
-  // Soporta form POST desde /admin/new y JSON
   try {
     await requireAuth(req);
   } catch {
-    return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401, headers: noStore() });
+    return NextResponse.json(
+      { ok: false, error: "No autorizado" },
+      { status: 401, headers: noStore() }
+    );
   }
 
   const ct = req.headers.get("content-type") || "";
@@ -62,7 +67,10 @@ export async function POST(req: Request) {
 
   const parsed = CertificateCreateSchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: "Datos inválidos", details: parsed.error.flatten() }, { status: 400, headers: noStore() });
+    return NextResponse.json(
+      { ok: false, error: "Datos inválidos", details: parsed.error.flatten() },
+      { status: 400, headers: noStore() }
+    );
   }
 
   const code = await generateUniqueCode(process.env.CODE_PREFIX || "CEDULL");
@@ -83,9 +91,9 @@ export async function POST(req: Request) {
     }
   });
 
-  // Si venía por form, redirige a detalle
   if (!ct.includes("application/json")) {
-    const url = new URL(`/admin/${cert.id}`, req.url);
+    const baseUrl = process.env.BASE_URL || "https://verifica.cedull.edu.pe";
+    const url = new URL(`/admin/${cert.id}`, baseUrl);
     return NextResponse.redirect(url, { headers: noStore() });
   }
 
