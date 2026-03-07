@@ -3,14 +3,19 @@ import { Card, CardContent, CardHeader } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { prisma } from "@/lib/db";
 import { qrDataUrl } from "@/lib/qr";
-import QrDownloadButton from "./QrDownloadButton";
 
 function fmtDate(d: Date) {
   return new Intl.DateTimeFormat("es-PE", { dateStyle: "medium" }).format(d);
 }
 
-export default async function AdminDetail({ params }: { params: { id: string } }) {
-  const cert = await prisma.certificate.findUnique({ where: { id: params.id } });
+export default async function AdminDetail({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const cert = await prisma.certificate.findUnique({
+    where: { id: params.id },
+  });
 
   if (!cert) {
     return (
@@ -34,7 +39,7 @@ export default async function AdminDetail({ params }: { params: { id: string } }
     );
   }
 
-  const baseUrl = process.env.BASE_URL || "https://verifica.edu.edu.pe";
+  const baseUrl = process.env.BASE_URL || "https://verifica.cedull.edu.pe";
   const publicUrl = `${baseUrl.replace(/\/$/, "")}/c/${encodeURIComponent(cert.code)}`;
   const qr = await qrDataUrl(publicUrl);
 
@@ -155,15 +160,18 @@ export default async function AdminDetail({ params }: { params: { id: string } }
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={qr}
-                alt="QR"
+                alt="QR del certificado"
                 className="h-56 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm"
               />
 
               <div className="grid gap-3">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600 break-all">
+                <div className="break-all rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
                   {publicUrl}
                 </div>
-                <QrDownloadButton dataUrl={qr} filename={`${cert.code}.png`} />
+
+                <a href={`/api/certificates/${cert.id}/qr`}>
+                  <Button variant="secondary">Descargar PNG</Button>
+                </a>
               </div>
             </div>
           </CardContent>
