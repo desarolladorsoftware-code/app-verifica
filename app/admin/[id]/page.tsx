@@ -3,9 +3,13 @@ import { Card, CardContent, CardHeader } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { prisma } from "@/lib/db";
 import { qrDataUrl } from "@/lib/qr";
+import CopyCertificateActions from "./CopyCertificateActions";
 
 function fmtDate(d: Date) {
-  return new Intl.DateTimeFormat("es-PE", { dateStyle: "medium" }).format(d);
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 export default async function AdminDetail({
@@ -60,7 +64,7 @@ export default async function AdminDetail({
         }
       />
 
-      <main className="mx-auto max-w-5xl px-4 py-8 grid gap-6">
+      <main className="mx-auto grid max-w-5xl gap-6 px-4 py-8">
         <div className="mb-1">
           <div className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-wide text-sky-700">
             Certificado
@@ -103,10 +107,13 @@ export default async function AdminDetail({
               </div>
 
               <div className="grid grid-cols-1 gap-1 sm:grid-cols-[180px_1fr]">
-                <span className="font-semibold text-slate-500">Fechas</span>
-                <span className="text-slate-800">
-                  {fmtDate(cert.startDate)} → {fmtDate(cert.endDate)}
-                </span>
+                <span className="font-semibold text-slate-500">Fecha de inicio</span>
+                <span className="text-slate-800">{fmtDate(cert.startDate)}</span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[180px_1fr]">
+                <span className="font-semibold text-slate-500">Fecha de fin</span>
+                <span className="text-slate-800">{fmtDate(cert.endDate)}</span>
               </div>
 
               <div className="grid grid-cols-1 gap-1 sm:grid-cols-[180px_1fr]">
@@ -125,7 +132,7 @@ export default async function AdminDetail({
               </div>
 
               <div className="grid grid-cols-1 gap-1 sm:grid-cols-[180px_1fr]">
-                <span className="font-semibold text-slate-500">Emisión</span>
+                <span className="font-semibold text-slate-500">Fecha de emisión</span>
                 <span className="text-slate-800">{fmtDate(cert.issueDate)}</span>
               </div>
 
@@ -153,7 +160,7 @@ export default async function AdminDetail({
         <Card>
           <CardHeader
             title="Código QR"
-            subtitle="Este QR apunta a la URL pública real de verificación."
+            subtitle="Descarga y comparte los recursos de verificación del certificado."
           />
           <CardContent>
             <div className="flex flex-col items-start gap-5 sm:flex-row">
@@ -169,9 +176,21 @@ export default async function AdminDetail({
                   {publicUrl}
                 </div>
 
-                <a href={`/api/certificates/${cert.id}/qr`}>
-                  <Button variant="secondary">Descargar PNG</Button>
-                </a>
+                <div className="flex flex-wrap gap-3">
+                  <a href={`/api/certificates/${cert.id}/qr`}>
+                    <Button variant="secondary">Descargar PNG</Button>
+                  </a>
+
+                  <a href={`/api/certificates/${cert.id}/qr-svg`}>
+                    <Button variant="secondary">Descargar SVG</Button>
+                  </a>
+
+                  <a href={`/api/certificates/${cert.id}/pdf`}>
+                    <Button variant="secondary">Descargar PDF</Button>
+                  </a>
+                </div>
+
+                <CopyCertificateActions code={cert.code} publicUrl={publicUrl} />
               </div>
             </div>
           </CardContent>

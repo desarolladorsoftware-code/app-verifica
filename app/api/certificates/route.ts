@@ -14,17 +14,23 @@ async function requireAuth(req: Request) {
 
 function noStore() {
   return {
-    "Cache-Control": "no-store"
+    "Cache-Control": "no-store",
   };
+}
+
+function toUtcMidnight(dateStr: string) {
+  return new Date(`${dateStr}T00:00:00.000Z`);
 }
 
 export async function GET(req: Request) {
   try {
     await requireAuth(req);
+
     const items = await prisma.certificate.findMany({
       orderBy: { createdAt: "desc" },
-      take: 500
+      take: 500,
     });
+
     return NextResponse.json({ ok: true, items }, { headers: noStore() });
   } catch {
     return NextResponse.json(
@@ -51,6 +57,7 @@ export async function POST(req: Request) {
     payload = await req.json();
   } else {
     const form = await req.formData();
+
     payload = {
       fullName: String(form.get("fullName") || ""),
       documentId: String(form.get("documentId") || "") || null,
@@ -61,11 +68,12 @@ export async function POST(req: Request) {
       institution: String(form.get("institution") || ""),
       authority: String(form.get("authority") || ""),
       issueDate: String(form.get("issueDate") || ""),
-      observations: String(form.get("observations") || "") || null
+      observations: String(form.get("observations") || "") || null,
     };
   }
 
   const parsed = CertificateCreateSchema.safeParse(payload);
+
   if (!parsed.success) {
     return NextResponse.json(
       { ok: false, error: "Datos inválidos", details: parsed.error.flatten() },
@@ -81,14 +89,14 @@ export async function POST(req: Request) {
       fullName: parsed.data.fullName,
       documentId: parsed.data.documentId || null,
       program: parsed.data.program,
-      startDate: new Date(parsed.data.startDate),
-      endDate: new Date(parsed.data.endDate),
+      startDate: toUtcMidnight(parsed.data.startDate),
+      endDate: toUtcMidnight(parsed.data.endDate),
       hours: parsed.data.hours,
       institution: parsed.data.institution,
       authority: parsed.data.authority,
-      issueDate: new Date(parsed.data.issueDate),
-      observations: parsed.data.observations || null
-    }
+      issueDate: toUtcMidnight(parsed.data.issueDate),
+      observations: parsed.data.observations || null,
+    },
   });
 
   if (!ct.includes("application/json")) {
@@ -97,5 +105,8 @@ export async function POST(req: Request) {
     return NextResponse.redirect(url, { headers: noStore() });
   }
 
-  return NextResponse.json({ ok: true, cert }, { status: 201, headers: noStore() });
+  return NextResponse.json(
+    { ok: true, cert },
+    { status: 201, headers: noStore() }
+  );
 }

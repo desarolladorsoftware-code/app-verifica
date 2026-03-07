@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 
-<div className="mb-6 rounded-2xl bg-red-500 p-6 text-white text-xl font-bold">
-  Tailwind OK
-</div>
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export default function AdminNew() {
   return (
@@ -53,46 +53,65 @@ export default function AdminNew() {
             <form className="grid gap-6" action="/api/certificates" method="POST">
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
+                  <label
+                    htmlFor="fullName"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
                     Nombre completo
                   </label>
-                  <Input name="fullName" required />
+                  <Input id="fullName" name="fullName" required />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
+                  <label
+                    htmlFor="documentId"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
                     Documento (opcional)
                   </label>
-                  <Input name="documentId" />
+                  <Input id="documentId" name="documentId" />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-800">
+                <label
+                  htmlFor="program"
+                  className="mb-2 block text-sm font-semibold text-slate-800"
+                >
                   Curso / Programa
                 </label>
-                <Input name="program" required />
+                <Input id="program" name="program" required />
               </div>
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
-                    Fecha inicio (ISO)
+                  <label
+                    htmlFor="startDate"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
+                    Fecha de inicio
                   </label>
                   <Input
+                    id="startDate"
                     name="startDate"
-                    placeholder="2026-03-01T00:00:00.000Z"
+                    type="date"
+                    defaultValue={todayISO()}
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
-                    Fecha fin (ISO)
+                  <label
+                    htmlFor="endDate"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
+                    Fecha de fin
                   </label>
                   <Input
+                    id="endDate"
                     name="endDate"
-                    placeholder="2026-03-30T00:00:00.000Z"
+                    type="date"
+                    defaultValue={todayISO()}
                     required
                   />
                 </div>
@@ -100,54 +119,68 @@ export default function AdminNew() {
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
+                  <label
+                    htmlFor="hours"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
                     Horas académicas
                   </label>
-                  <Input name="hours" type="number" min={1} required />
+                  <Input id="hours" name="hours" type="number" min={1} required />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
+                  <label
+                    htmlFor="institution"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
                     Institución / Organizador
                   </label>
-                  <Input name="institution" required />
+                  <Input id="institution" name="institution" required />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
-                    Firma/Autoridad (texto)
+                  <label
+                    htmlFor="authority"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
+                    Firma / Autoridad
                   </label>
-                  <Input name="authority" required />
+                  <Input id="authority" name="authority" required />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-800">
-                    Fecha de emisión (ISO)
+                  <label
+                    htmlFor="issueDate"
+                    className="mb-2 block text-sm font-semibold text-slate-800"
+                  >
+                    Fecha de emisión
                   </label>
                   <Input
+                    id="issueDate"
                     name="issueDate"
-                    placeholder="2026-03-30T00:00:00.000Z"
+                    type="date"
+                    defaultValue={todayISO()}
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-800">
+                <label
+                  htmlFor="observations"
+                  className="mb-2 block text-sm font-semibold text-slate-800"
+                >
                   Observaciones (opcional)
                 </label>
-                <Input name="observations" />
+                <Input id="observations" name="observations" />
               </div>
 
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4">
-                <p className="text-sm leading-6 text-amber-900">
-                  <span className="font-semibold">Importante:</span> usa formato ISO con Z (UTC). Ejemplo:
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4">
+                <p className="text-sm leading-6 text-emerald-900">
+                  Selecciona las fechas desde el calendario. El sistema las convertirá automáticamente al formato correcto al guardar el certificado.
                 </p>
-                <div className="mt-2 inline-block rounded-lg border border-amber-200 bg-white px-3 py-2 font-mono text-xs text-slate-700">
-                  2026-03-01T00:00:00.000Z
-                </div>
               </div>
 
               <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
