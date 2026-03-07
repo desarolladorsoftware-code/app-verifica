@@ -8,13 +8,14 @@ export function Navbar({ right }: { right?: React.ReactNode }) {
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-sm font-bold text-white shadow-md">
             V
           </div>
-          <div>
+
+          <div className="leading-tight">
             <p className="text-sm font-semibold text-slate-900">Verifica</p>
             <p className="text-xs text-slate-500">Panel administrativo</p>
           </div>
         </div>
 
-        <div>{right}</div>
+        <div className="flex items-center gap-2">{right}</div>
       </div>
     </header>
   );

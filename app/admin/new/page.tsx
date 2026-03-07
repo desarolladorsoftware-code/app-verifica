@@ -3,6 +3,10 @@ import { Card, CardContent, CardHeader } from "@/components/Card";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 
+<div className="mb-6 rounded-2xl bg-red-500 p-6 text-white text-xl font-bold">
+  Tailwind OK
+</div>
+
 export default function AdminNew() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
