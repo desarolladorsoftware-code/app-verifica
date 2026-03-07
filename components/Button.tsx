@@ -1,18 +1,22 @@
-import React from "react";
+import * as React from "react";
 
-type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "danger";
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: "primary" | "secondary";
 };
 
-export function Button({ variant = "primary", className = "", ...props }: Props) {
+export function Button({
+  className = "",
+  variant = "primary",
+  type = "button",
+  ...props
+}: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:opacity-60 disabled:cursor-not-allowed";
-  const styles =
-    variant === "primary"
-      ? "bg-slate-900 text-white hover:bg-slate-800"
-      : variant === "danger"
-      ? "bg-rose-600 text-white hover:bg-rose-500"
-      : "bg-slate-100 text-slate-900 hover:bg-slate-200";
+    "inline-flex items-center justify-center rounded-2xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none";
 
-  return <button className={`${base} ${styles} ${className}`} {...props} />;
+  const styles =
+    variant === "secondary"
+      ? "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm"
+      : "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/10";
+
+  return <button type={type} {...props} className={`${base} ${styles} ${className}`} />;
 }
