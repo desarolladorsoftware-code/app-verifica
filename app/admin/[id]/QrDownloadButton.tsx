@@ -11,7 +11,7 @@ export default function QrDownloadButton({
 }) {
   function download() {
     alert("clic detectado");
-    console.log("clic detectado", { dataUrl, filename });
+    console.log("clic detectado", { filename, dataUrl: dataUrl?.slice(0, 40) });
   }
 
   return (
