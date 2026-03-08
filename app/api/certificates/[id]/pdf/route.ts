@@ -192,7 +192,9 @@ export async function GET(
     }
 
     const baseUrl = process.env.BASE_URL || "https://verifica.cedull.edu.pe";
-    const publicUrl = `${baseUrl.replace(/\/$/, "")}/c/${encodeURIComponent(cert.code)}`;
+    const publicUrl = `${baseUrl.replace(/\/$/, "")}/c/${encodeURIComponent(
+      cert.code
+    )}`;
 
     const [logoBytes, signatureBytes, qrPng] = await Promise.all([
       readPublicAsset("assets/certificates/logo-cedull.png"),
@@ -210,13 +212,13 @@ export async function GET(
     const { width, height } = page.getSize();
 
     const COLORS = {
-      blue: rgb(6 / 255, 166 / 255, 255 / 255),      // #06A6FF
-      orange: rgb(251 / 255, 90 / 255, 0 / 255),     // #FB5A00
-      yellow: rgb(243 / 255, 200 / 255, 15 / 255),   // #F3C80F
-      white: rgb(1, 1, 1),                           // #FFFFFF
-      black: rgb(0, 0, 0),                           // #000000
-      body: rgb(0.20, 0.20, 0.20),
-      soft: rgb(0.30, 0.30, 0.30),
+      blue: rgb(6 / 255, 166 / 255, 255 / 255), // #06A6FF
+      orange: rgb(251 / 255, 90 / 255, 0 / 255), // #FB5A00
+      yellow: rgb(243 / 255, 200 / 255, 15 / 255), // #F3C80F
+      white: rgb(1, 1, 1), // #FFFFFF
+      black: rgb(0, 0, 0), // #000000
+      body: rgb(0.2, 0.2, 0.2),
+      soft: rgb(0.3, 0.3, 0.3),
     };
 
     const FONTS = {
@@ -231,14 +233,14 @@ export async function GET(
     const LAYOUT = {
       page: { width, height },
 
-      // Marcos
       outerFrame: {
         x: 2,
         y: 2,
         width: width - 4,
         height: height - 4,
-        borderWidth: 18,
+        borderWidth: 22,
       },
+
       innerFrame: {
         x: 27,
         y: 27,
@@ -247,29 +249,15 @@ export async function GET(
         borderWidth: 4,
       },
 
-      // Remates
-      frameAccents: {
-        topLeftX: 27,
-        topRightX: width - 97,
-        bottomLeftX: 27,
-        bottomRightX: width - 97,
-        yTop: height - 10,
-        yBottom: 7,
-        width: 70,
-        height: 3,
-      },
-
-      // Offsets globales por zona
       offsets: {
-        header: 14, // sube o baja TODO el bloque superior
+        header: 14,
         body: 0,
         footer: 0,
       },
 
-      // Header
       header: {
         logoRight: 52,
-        logoTop: 88,
+        logoTop: 70,
         logoScale: 0.042,
 
         institutionalTextY: height - 92,
@@ -280,7 +268,6 @@ export async function GET(
         nameUnderlineY: height - 244,
       },
 
-      // Body
       body: {
         paragraphY: height - 302,
         paragraphMaxWidth: 575,
@@ -288,32 +275,29 @@ export async function GET(
         paragraphLineHeight: 17,
       },
 
-      // Footer
       footer: {
-        qrX: 58,
-        qrY: 74,
-        qrSize: 58,
-        codeX: 46,
-        codeY: 56,
+        qrX: 78,
+        qrY: 66,
+        qrSize: 74,
+        codeX: 64,
+        codeY: 46,
 
-        signatureY: 90,
+        signatureY: 74,
         signatureScale: 0.215,
-        signatureLineY: 82,
-        signerNameY: 66,
-        signerRoleY: 50,
+        signatureLineY: 72,
+        signerNameY: 56,
+        signerRoleY: 41,
 
-        dateBlockX: width - 144,
-        dateLabelY: 68,
-        dateValueY: 52,
+        dateCenterX: width - 94,
+        dateLabelY: 62,
+        dateValueY: 46,
       },
     };
 
-    // Helpers de zonas
     const HY = (y: number) => y - LAYOUT.offsets.header;
     const BY = (y: number) => y - LAYOUT.offsets.body;
     const FY = (y: number) => y - LAYOUT.offsets.footer;
 
-    // Fondo
     page.drawRectangle({
       x: 0,
       y: 0,
@@ -322,7 +306,6 @@ export async function GET(
       color: COLORS.white,
     });
 
-    // Borde exterior celeste
     page.drawRectangle({
       x: LAYOUT.outerFrame.x,
       y: LAYOUT.outerFrame.y,
@@ -332,7 +315,6 @@ export async function GET(
       borderWidth: LAYOUT.outerFrame.borderWidth,
     });
 
-    // Marco interior dorado
     page.drawRectangle({
       x: LAYOUT.innerFrame.x,
       y: LAYOUT.innerFrame.y,
@@ -342,40 +324,6 @@ export async function GET(
       borderWidth: LAYOUT.innerFrame.borderWidth,
     });
 
-    // Remates
-    page.drawRectangle({
-      x: LAYOUT.frameAccents.topLeftX,
-      y: LAYOUT.frameAccents.yTop,
-      width: LAYOUT.frameAccents.width,
-      height: LAYOUT.frameAccents.height,
-      color: COLORS.blue,
-    });
-
-    page.drawRectangle({
-      x: LAYOUT.frameAccents.topRightX,
-      y: LAYOUT.frameAccents.yTop,
-      width: LAYOUT.frameAccents.width,
-      height: LAYOUT.frameAccents.height,
-      color: COLORS.orange,
-    });
-
-    page.drawRectangle({
-      x: LAYOUT.frameAccents.bottomLeftX,
-      y: LAYOUT.frameAccents.yBottom,
-      width: LAYOUT.frameAccents.width,
-      height: LAYOUT.frameAccents.height,
-      color: COLORS.yellow,
-    });
-
-    page.drawRectangle({
-      x: LAYOUT.frameAccents.bottomRightX,
-      y: LAYOUT.frameAccents.yBottom,
-      width: LAYOUT.frameAccents.width,
-      height: LAYOUT.frameAccents.height,
-      color: COLORS.blue,
-    });
-
-    // Logo
     const logoDims = logoImage.scale(LAYOUT.header.logoScale);
     page.drawImage(logoImage, {
       x: width - logoDims.width - LAYOUT.header.logoRight,
@@ -384,7 +332,6 @@ export async function GET(
       height: logoDims.height,
     });
 
-    // Texto institucional
     drawCenteredText({
       page,
       text: 'Corporación de Educación Luis Llerena “CEDULL” otorga el presente',
@@ -394,7 +341,6 @@ export async function GET(
       color: COLORS.black,
     });
 
-    // Título
     drawCenteredText({
       page,
       text: "CERTIFICADO",
@@ -404,7 +350,6 @@ export async function GET(
       color: COLORS.black,
     });
 
-    // Línea naranja bajo título
     page.drawRectangle({
       x: width / 2 - 72,
       y: HY(LAYOUT.header.titleUnderlineY),
@@ -413,7 +358,6 @@ export async function GET(
       color: COLORS.orange,
     });
 
-    // Subtítulo
     drawCenteredText({
       page,
       text: "Otorgado a:",
@@ -423,7 +367,6 @@ export async function GET(
       color: COLORS.blue,
     });
 
-    // Nombre
     let nameSize = 25;
     if (cert.fullName.length > 30) nameSize = 22;
     if (cert.fullName.length > 42) nameSize = 19;
@@ -437,7 +380,6 @@ export async function GET(
       color: COLORS.black,
     });
 
-    // Línea amarilla bajo nombre
     page.drawRectangle({
       x: width / 2 - 145,
       y: HY(LAYOUT.header.nameUnderlineY),
@@ -446,7 +388,6 @@ export async function GET(
       color: COLORS.yellow,
     });
 
-    // Párrafo central
     drawRichCenteredParagraph({
       page,
       y: BY(LAYOUT.body.paragraphY),
@@ -470,7 +411,6 @@ export async function GET(
       ],
     });
 
-    // QR
     page.drawImage(qrImage, {
       x: LAYOUT.footer.qrX,
       y: FY(LAYOUT.footer.qrY),
@@ -486,7 +426,6 @@ export async function GET(
       color: COLORS.blue,
     });
 
-    // Firma
     const sigDims = signatureImage.scale(LAYOUT.footer.signatureScale);
     const sigX = width / 2 - sigDims.width / 2;
 
@@ -522,22 +461,26 @@ export async function GET(
       color: COLORS.body,
     });
 
-    // Fecha
     const dateLabel = "Fecha de emisión";
     const dateValue = fmtDateShort(cert.issueDate);
+    const dateLabelSize = 8.2;
+    const dateValueSize = 11.2;
+
+    const labelWidth = FONTS.bold.widthOfTextAtSize(dateLabel, dateLabelSize);
+    const valueWidth = FONTS.bold.widthOfTextAtSize(dateValue, dateValueSize);
 
     page.drawText(dateLabel, {
-      x: LAYOUT.footer.dateBlockX,
+      x: LAYOUT.footer.dateCenterX - labelWidth / 2,
       y: FY(LAYOUT.footer.dateLabelY),
-      size: 8.8,
+      size: dateLabelSize,
       font: FONTS.bold,
       color: COLORS.orange,
     });
 
     page.drawText(dateValue, {
-      x: LAYOUT.footer.dateBlockX,
+      x: LAYOUT.footer.dateCenterX - valueWidth / 2,
       y: FY(LAYOUT.footer.dateValueY),
-      size: 13,
+      size: dateValueSize,
       font: FONTS.bold,
       color: COLORS.black,
     });
