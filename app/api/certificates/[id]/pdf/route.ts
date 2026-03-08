@@ -283,9 +283,9 @@ export async function GET(
         codeY: 46,
 
         signatureY: 85,
-        signatureScale: 0.300,
-        signatureLineY: 110,
-        signerNameY: 90,
+        signatureScale: 0.320,
+        signatureLineY: 115,
+        signerNameY: 100,
         signerRoleY: 80,
 
         dateCenterX: width - 94,
