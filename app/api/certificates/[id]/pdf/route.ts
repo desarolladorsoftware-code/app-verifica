@@ -284,9 +284,9 @@ export async function GET(
 
         signatureY: 74,
         signatureScale: 0.215,
-        signatureLineY: 72,
-        signerNameY: 56,
-        signerRoleY: 41,
+        signatureLineY: 80,
+        signerNameY: 60,
+        signerRoleY: 50,
 
         dateCenterX: width - 94,
         dateLabelY: 62,
@@ -360,7 +360,7 @@ export async function GET(
 
     drawCenteredText({
       page,
-      text: "Otorgado a:",
+      text: "a:",
       font: FONTS.bold,
       size: 15,
       y: HY(LAYOUT.header.subtitleY),
