@@ -9,7 +9,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-3xl border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] ${className}`}
+      className={`rounded-[28px] border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)] transition-all duration-200 ${className}`}
     >
       {children}
     </div>
@@ -27,7 +27,7 @@ export function CardHeader({
 }) {
   return (
     <div className={`border-b border-slate-100 px-6 py-6 sm:px-8 ${className}`}>
-      <h2 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-slate-950">{title}</h2>
       {subtitle ? (
         <p className="mt-2 text-sm leading-6 text-slate-600">{subtitle}</p>
       ) : null}

@@ -23,7 +23,7 @@ export default async function VerifyByUrl({ params }: { params: { code: string }
                 <div><span className="text-slate-600">Participante:</span> <span className="font-semibold">{cert.fullName}</span></div>
                 <div><span className="text-slate-600">Documento:</span> {cert.documentId || "—"}</div>
                 <div><span className="text-slate-600">Curso/Programa:</span> {cert.program}</div>
-                <div><span className="text-slate-600">Fechas:</span> {fmtDate(cert.startDate)} → {fmtDate(cert.endDate)}</div>
+                <div><span className="text-slate-600">Fechas:</span> {fmtDate(cert.startDate)} al {fmtDate(cert.endDate)}</div>
                 <div><span className="text-slate-600">Horas:</span> {cert.hours}</div>
                 <div><span className="text-slate-600">Institución:</span> {cert.institution}</div>
                 <div><span className="text-slate-600">Autoridad/Firma:</span> {cert.authority}</div>
