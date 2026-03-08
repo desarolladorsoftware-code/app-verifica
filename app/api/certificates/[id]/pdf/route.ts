@@ -60,13 +60,13 @@ function drawCenteredText(opts: {
   });
 }
 
-function drawTextLineCentered(opts: {
+function drawLineSegmentsCentered(opts: {
   page: any;
-  segments: Array<{ text: string; font: any; color: any }>;
-  size: number;
   y: number;
+  size: number;
+  segments: Array<{ text: string; font: any; color: any }>;
 }) {
-  const { page, segments, size, y } = opts;
+  const { page, y, size, segments } = opts;
 
   const totalWidth = segments.reduce(
     (acc, seg) => acc + seg.font.widthOfTextAtSize(seg.text, size),
@@ -85,109 +85,6 @@ function drawTextLineCentered(opts: {
     });
     x += seg.font.widthOfTextAtSize(seg.text, size);
   }
-}
-
-function wrapSegmentsIntoLines(opts: {
-  segments: Array<{ text: string; bold?: boolean }>;
-  regularFont: any;
-  boldFont: any;
-  size: number;
-  maxWidth: number;
-}) {
-  const { segments, regularFont, boldFont, size, maxWidth } = opts;
-
-  const tokens: Array<{ text: string; bold: boolean }> = [];
-
-  for (const segment of segments) {
-    const parts = segment.text.split(" ");
-    parts.forEach((part, index) => {
-      const token = index === parts.length - 1 ? part : `${part} `;
-      if (token) tokens.push({ text: token, bold: !!segment.bold });
-    });
-    tokens.push({ text: " ", bold: !!segment.bold });
-  }
-
-  if (tokens.length && tokens[tokens.length - 1].text === " ") {
-    tokens.pop();
-  }
-
-  const lines: Array<Array<{ text: string; bold: boolean }>> = [];
-  let currentLine: Array<{ text: string; bold: boolean }> = [];
-  let currentWidth = 0;
-
-  for (const token of tokens) {
-    const font = token.bold ? boldFont : regularFont;
-    const tokenWidth = font.widthOfTextAtSize(token.text, size);
-
-    if (currentLine.length === 0 || currentWidth + tokenWidth <= maxWidth) {
-      currentLine.push(token);
-      currentWidth += tokenWidth;
-    } else {
-      lines.push(currentLine);
-      currentLine = [token];
-      currentWidth = tokenWidth;
-    }
-  }
-
-  if (currentLine.length) lines.push(currentLine);
-
-  return lines;
-}
-
-function drawRichCenteredParagraph(opts: {
-  page: any;
-  y: number;
-  size: number;
-  maxWidth: number;
-  lineHeight: number;
-  regularFont: any;
-  boldFont: any;
-  regularColor: any;
-  boldColor: any;
-  segments: Array<{ text: string; bold?: boolean }>;
-}) {
-  const {
-    page,
-    y,
-    size,
-    maxWidth,
-    lineHeight,
-    regularFont,
-    boldFont,
-    regularColor,
-    boldColor,
-    segments,
-  } = opts;
-
-  const lines = wrapSegmentsIntoLines({
-    segments,
-    regularFont,
-    boldFont,
-    size,
-    maxWidth,
-  });
-
-  lines.forEach((line, index) => {
-    const lineWidth = line.reduce((acc, token) => {
-      const font = token.bold ? boldFont : regularFont;
-      return acc + font.widthOfTextAtSize(token.text, size);
-    }, 0);
-
-    let x = (page.getWidth() - lineWidth) / 2;
-    const lineY = y - index * lineHeight;
-
-    for (const token of line) {
-      const font = token.bold ? boldFont : regularFont;
-      page.drawText(token.text, {
-        x,
-        y: lineY,
-        size,
-        font,
-        color: token.bold ? boldColor : regularColor,
-      });
-      x += font.widthOfTextAtSize(token.text, size);
-    }
-  });
 }
 
 export async function GET(
@@ -229,19 +126,12 @@ export async function GET(
     const { width, height } = page.getSize();
 
     // Colores corporativos
-    const brandBlue = rgb(6 / 255, 166 / 255, 255 / 255); // #06A6FF
+    const brandBlue = rgb(6 / 255, 166 / 255, 255 / 255);   // #06A6FF
     const brandOrange = rgb(251 / 255, 90 / 255, 0 / 255); // #FB5A00
     const brandYellow = rgb(243 / 255, 200 / 255, 15 / 255); // #F3C80F
     const black = rgb(0, 0, 0);
     const white = rgb(1, 1, 1);
-
-    // Tonos elegantes basados en marca
-    const darkFrame = rgb(0.08, 0.14, 0.36);
-    const goldSoft = rgb(0.84, 0.65, 0.29);
-    const bodyText = rgb(0.16, 0.19, 0.34);
-    const grayText = rgb(0.34, 0.34, 0.34);
-    const lightFill = rgb(0.985, 0.985, 0.99);
-    const softDecor = rgb(0.9, 0.95, 1);
+    const softGray = rgb(0.28, 0.28, 0.28);
 
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -252,214 +142,237 @@ export async function GET(
     const signatureImage = await pdfDoc.embedPng(signatureBytes);
     const qrImage = await pdfDoc.embedPng(qrPng);
 
-    // Fondo
+    // =========================
+    // FONDO Y MARCO PRINCIPAL
+    // =========================
     page.drawRectangle({
       x: 0,
       y: 0,
       width,
       height,
-      color: darkFrame,
+      color: brandBlue,
     });
 
+    // Lienzo blanco interior
     page.drawRectangle({
-      x: 20,
-      y: 20,
-      width: width - 40,
-      height: height - 40,
-      color: lightFill,
+      x: 24,
+      y: 24,
+      width: width - 48,
+      height: height - 48,
+      color: white,
     });
 
-    // Marco interior fino
+    // Línea dorada interior principal
     page.drawRectangle({
-      x: 35,
-      y: 35,
-      width: width - 70,
-      height: height - 70,
-      borderColor: goldSoft,
-      borderWidth: 1.2,
+      x: 38,
+      y: 38,
+      width: width - 76,
+      height: height - 76,
+      borderColor: brandYellow,
+      borderWidth: 1.3,
     });
 
-    // Borde ornamental superior e inferior
-    page.drawLine({
-      start: { x: 72, y: height - 22 },
-      end: { x: width - 72, y: height - 22 },
-      thickness: 3,
-      color: goldSoft,
-    });
+    // Recorte ornamental de esquinas tipo diploma
+    const cornerR = 34;
 
-    page.drawLine({
-      start: { x: 72, y: 22 },
-      end: { x: width - 72, y: 22 },
-      thickness: 3,
-      color: goldSoft,
-    });
-
-    // Lados ornamentales
-    page.drawLine({
-      start: { x: 22, y: 72 },
-      end: { x: 22, y: height - 72 },
-      thickness: 3,
-      color: goldSoft,
-    });
-
-    page.drawLine({
-      start: { x: width - 22, y: 72 },
-      end: { x: width - 22, y: height - 72 },
-      thickness: 3,
-      color: goldSoft,
-    });
-
-    // Esquinas curvas simuladas
-    const r = 52;
-
-    // superior izquierda
-    page.drawRectangle({ x: 22, y: height - 72, width: r, height: r, color: lightFill });
-    page.drawEllipse({
-      x: 74,
-      y: height - 74,
-      xScale: 44,
-      yScale: 44,
-      borderColor: goldSoft,
-      borderWidth: 3,
-    });
-
-    // superior derecha
+    // Superior izquierda
     page.drawRectangle({
-      x: width - 74,
-      y: height - 72,
-      width: r,
-      height: r,
-      color: lightFill,
+      x: 24,
+      y: height - 24 - 54,
+      width: 54,
+      height: 54,
+      color: white,
     });
-    page.drawEllipse({
-      x: width - 74,
-      y: height - 74,
-      xScale: 44,
-      yScale: 44,
-      borderColor: goldSoft,
-      borderWidth: 3,
+    page.drawCircle({
+      x: 78,
+      y: height - 78,
+      size: cornerR,
+      borderColor: brandYellow,
+      borderWidth: 2,
     });
-
-    // inferior izquierda
-    page.drawRectangle({ x: 22, y: 22, width: r, height: r, color: lightFill });
-    page.drawEllipse({
-      x: 74,
-      y: 74,
-      xScale: 44,
-      yScale: 44,
-      borderColor: goldSoft,
-      borderWidth: 3,
-    });
-
-    // inferior derecha
     page.drawRectangle({
-      x: width - 74,
-      y: 22,
-      width: r,
-      height: r,
-      color: lightFill,
+      x: 78,
+      y: height - 44,
+      width: 38,
+      height: 38,
+      color: white,
     });
-    page.drawEllipse({
-      x: width - 74,
-      y: 74,
-      xScale: 44,
-      yScale: 44,
-      borderColor: goldSoft,
-      borderWidth: 3,
+    page.drawRectangle({
+      x: 44,
+      y: height - 78,
+      width: 38,
+      height: 38,
+      color: white,
     });
 
-    // Puntos decorativos exteriores
-    const outerDots = [
-      [12, height - 12],
-      [width - 12, height - 12],
-      [12, 12],
-      [width - 12, 12],
+    // Superior derecha
+    page.drawRectangle({
+      x: width - 78,
+      y: height - 24 - 54,
+      width: 54,
+      height: 54,
+      color: white,
+    });
+    page.drawCircle({
+      x: width - 78,
+      y: height - 78,
+      size: cornerR,
+      borderColor: brandYellow,
+      borderWidth: 2,
+    });
+    page.drawRectangle({
+      x: width - 116,
+      y: height - 44,
+      width: 38,
+      height: 38,
+      color: white,
+    });
+    page.drawRectangle({
+      x: width - 78,
+      y: height - 78,
+      width: 38,
+      height: 38,
+      color: white,
+    });
+
+    // Inferior izquierda
+    page.drawRectangle({
+      x: 24,
+      y: 24,
+      width: 54,
+      height: 54,
+      color: white,
+    });
+    page.drawCircle({
+      x: 78,
+      y: 78,
+      size: cornerR,
+      borderColor: brandYellow,
+      borderWidth: 2,
+    });
+    page.drawRectangle({
+      x: 78,
+      y: 40,
+      width: 38,
+      height: 38,
+      color: white,
+    });
+    page.drawRectangle({
+      x: 44,
+      y: 78,
+      width: 38,
+      height: 38,
+      color: white,
+    });
+
+    // Inferior derecha
+    page.drawRectangle({
+      x: width - 78,
+      y: 24,
+      width: 54,
+      height: 54,
+      color: white,
+    });
+    page.drawCircle({
+      x: width - 78,
+      y: 78,
+      size: cornerR,
+      borderColor: brandYellow,
+      borderWidth: 2,
+    });
+    page.drawRectangle({
+      x: width - 116,
+      y: 40,
+      width: 38,
+      height: 38,
+      color: white,
+    });
+    page.drawRectangle({
+      x: width - 78,
+      y: 78,
+      width: 38,
+      height: 38,
+      color: white,
+    });
+
+    // Línea dorada superior e inferior visual tipo ejemplo
+    page.drawLine({
+      start: { x: 70, y: height - 24 },
+      end: { x: width - 70, y: height - 24 },
+      thickness: 2,
+      color: brandYellow,
+    });
+
+    page.drawLine({
+      start: { x: 70, y: 24 },
+      end: { x: width - 70, y: 24 },
+      thickness: 2,
+      color: brandYellow,
+    });
+
+    // Puntos decorativos pequeños
+    const points = [
+      { x: 10, y: height - 10 },
+      { x: width - 10, y: height - 10 },
+      { x: 10, y: 10 },
+      { x: width - 10, y: 10 },
     ];
-    for (const [x, y] of outerDots) {
+    for (const p of points) {
       page.drawCircle({
-        x,
-        y,
+        x: p.x,
+        y: p.y,
         size: 4.5,
-        color: goldSoft,
+        color: brandYellow,
       });
     }
 
-    // Decoración inferior derecha suave
-    page.drawEllipse({
-      x: width - 115,
-      y: 132,
-      xScale: 98,
-      yScale: 110,
-      color: softDecor,
-      opacity: 0.5,
-    });
-
-    page.drawEllipse({
-      x: width - 200,
-      y: 84,
-      xScale: 54,
-      yScale: 42,
-      color: brandBlue,
-      opacity: 0.07,
-    });
-
-    for (let row = 0; row < 5; row++) {
-      for (let col = 0; col < 7; col++) {
-        if ((row + col) % 2 === 0) {
-          page.drawCircle({
-            x: width - 158 + col * 11,
-            y: 76 + row * 11,
-            size: 1.8,
-            color: brandBlue,
-            opacity: 0.55,
-          });
-        }
-      }
-    }
-
-    // Logo arriba derecha
-    const logoDims = logoImage.scale(0.044);
+    // =========================
+    // LOGO
+    // =========================
+    const logoDims = logoImage.scale(0.043);
     page.drawImage(logoImage, {
-      x: width - logoDims.width - 62,
+      x: width - logoDims.width - 58,
       y: height - 82,
       width: logoDims.width,
       height: logoDims.height,
     });
 
-    // Texto institucional superior
+    // =========================
+    // CABECERA
+    // =========================
     drawCenteredText({
       page,
       text: 'Corporación de Educación Luis Llerena “CEDULL” otorga el presente',
       font: fontRegular,
       size: 13.5,
-      y: height - 118,
-      color: bodyText,
+      y: height - 120,
+      color: black,
     });
 
-    // Título principal con serif elegante
     drawCenteredText({
       page,
       text: "Certificado",
       font: fontTitle,
-      size: 42,
+      size: 38,
       y: height - 190,
-      color: darkFrame,
+      color: black,
     });
 
-    // Subtítulo
     drawCenteredText({
       page,
       text: "OTORGADO A:",
       font: fontRegular,
       size: 15,
       y: height - 232,
-      color: goldSoft,
+      color: brandOrange,
     });
 
-    // Nombre principal
-    let nameSize = 40;
-    if (cert.fullName.length > 28) nameSize = 34;
-    if (cert.fullName.length > 40) nameSize = 29;
+    // =========================
+    // NOMBRE
+    // =========================
+    let nameSize = 35;
+    if (cert.fullName.length > 28) nameSize = 31;
+    if (cert.fullName.length > 40) nameSize = 27;
 
     drawCenteredText({
       page,
@@ -467,96 +380,145 @@ export async function GET(
       font: fontName,
       size: nameSize,
       y: height - 315,
-      color: darkFrame,
+      color: black,
     });
 
-    // Línea decorativa bajo nombre
     page.drawLine({
-      start: { x: width / 2 - 122, y: height - 328 },
-      end: { x: width / 2 + 122, y: height - 328 },
+      start: { x: width / 2 - 110, y: height - 327 },
+      end: { x: width / 2 + 110, y: height - 327 },
       thickness: 1.4,
-      color: goldSoft,
+      color: brandYellow,
     });
 
-    // Párrafo principal
-    drawRichCenteredParagraph({
+    // =========================
+    // PÁRRAFO
+    // =========================
+    const paragraphY = height - 390;
+    const paragraphSize = 13.8;
+
+    drawLineSegmentsCentered({
       page,
-      y: height - 388,
-      size: 14,
-      maxWidth: 570,
-      lineHeight: 19,
-      regularFont: fontRegular,
-      boldFont: fontBold,
-      regularColor: bodyText,
-      boldColor: bodyText,
+      y: paragraphY,
+      size: paragraphSize,
       segments: [
-        { text: "al haber aprobado satisfactoriamente el curso de " },
-        { text: cert.program, bold: true },
-        { text: " con una " },
-        { text: `duración de ${cert.hours} horas académicas`, bold: true },
-        {
-          text: `, realizado del ${fmtDateLongEs(cert.startDate)} al ${fmtDateLongEs(
-            cert.endDate
-          )}.`,
-        },
+        { text: "al haber aprobado ", font: fontRegular, color: softGray },
+        { text: "satisfactoriamente", font: fontBold, color: softGray },
       ],
     });
 
-    // QR abajo izquierda sin marco
+    drawLineSegmentsCentered({
+      page,
+      y: paragraphY - 20,
+      size: paragraphSize,
+      segments: [
+        { text: "el curso de ", font: fontRegular, color: softGray },
+        { text: cert.program, font: fontBold, color: softGray },
+        { text: " con una", font: fontRegular, color: softGray },
+      ],
+    });
+
+    drawLineSegmentsCentered({
+      page,
+      y: paragraphY - 40,
+      size: paragraphSize,
+      segments: [
+        {
+          text: `duración de ${cert.hours} horas académicas`,
+          font: fontBold,
+          color: softGray,
+        },
+        { text: ",", font: fontRegular, color: softGray },
+      ],
+    });
+
+    drawLineSegmentsCentered({
+      page,
+      y: paragraphY - 60,
+      size: paragraphSize,
+      segments: [
+        { text: "realizado del ", font: fontRegular, color: softGray },
+        {
+          text: fmtDateLongEs(cert.startDate),
+          font: fontRegular,
+          color: softGray,
+        },
+        { text: " al ", font: fontRegular, color: softGray },
+        {
+          text: fmtDateLongEs(cert.endDate),
+          font: fontRegular,
+          color: softGray,
+        },
+        { text: ".", font: fontRegular, color: softGray },
+      ],
+    });
+
+    // =========================
+    // QR + CÓDIGO
+    // =========================
     page.drawImage(qrImage, {
-      x: 88,
-      y: 102,
-      width: 66,
-      height: 66,
+      x: 90,
+      y: 98,
+      width: 62,
+      height: 62,
     });
 
-    page.drawText(`ID del certificado: ${cert.code}`, {
-      x: 86,
-      y: 52,
+    page.drawText(cert.code, {
+      x: 84,
+      y: 54,
       size: 10,
-      font: fontRegular,
-      color: bodyText,
+      font: fontBold,
+      color: brandBlue,
     });
 
-    // Medalla central decorativa
+    // =========================
+    // MEDALLA CENTRAL
+    // =========================
+    const medalX = width / 2;
+    const medalY = 120;
+
     page.drawCircle({
-      x: width / 2,
-      y: 116,
-      size: 34,
-      borderColor: goldSoft,
-      borderWidth: 1.5,
+      x: medalX,
+      y: medalY,
+      size: 31,
+      borderColor: brandYellow,
+      borderWidth: 1.2,
     });
+
     page.drawCircle({
-      x: width / 2,
-      y: 116,
-      size: 28,
-      borderColor: goldSoft,
+      x: medalX,
+      y: medalY,
+      size: 25,
+      borderColor: brandYellow,
       borderWidth: 1,
     });
+
     drawCenteredText({
       page,
       text: "CEDULL",
       font: fontBold,
-      size: 9,
-      y: 116,
-      color: goldSoft,
+      size: 8.5,
+      y: medalY,
+      color: brandYellow,
     });
+
     drawCenteredText({
       page,
       text: "2026",
       font: fontBold,
-      size: 9,
-      y: 102,
-      color: goldSoft,
+      size: 8.5,
+      y: medalY - 13,
+      color: brandYellow,
     });
 
-    // Firma izquierda-centro visualmente
-    const sigDims = signatureImage.scale(0.22);
+    // =========================
+    // FIRMA
+    // =========================
+    const sigDims = signatureImage.scale(0.21);
     const sigX = width / 2 - sigDims.width / 2;
 
     page.drawImage(signatureImage, {
       x: sigX,
-      y: 124,
+      y: 128,
       width: sigDims.width,
       height: sigDims.height,
     });
@@ -565,64 +527,54 @@ export async function GET(
       start: { x: width / 2 - 92, y: 108 },
       end: { x: width / 2 + 92, y: 108 },
       thickness: 1,
-      color: goldSoft,
+      color: brandYellow,
     });
 
     drawCenteredText({
       page,
       text: "JOSE LUIS LLERENA FLORES",
       font: fontBold,
-      size: 10.5,
+      size: 10.2,
       y: 90,
-      color: darkFrame,
+      color: black,
     });
 
     drawCenteredText({
       page,
       text: "Director de Formación Continua",
       font: fontRegular,
-      size: 9.5,
+      size: 9.2,
       y: 74,
-      color: bodyText,
+      color: softGray,
     });
 
-    // Fecha de emisión abajo derecha
-    drawTextLineCentered({
-      page,
-      size: 10,
-      y: 52,
-      segments: [
-        { text: "Fecha de emisión: ", font: fontRegular, color: bodyText },
-        { text: fmtDateLongEs(cert.issueDate), font: fontRegular, color: bodyText },
-      ],
-    });
-
-    // Ajuste de la fecha a la derecha real
+    // =========================
+    // FECHA
+    // =========================
     const dateLabel = "Fecha de emisión: ";
     const dateValue = fmtDateLongEs(cert.issueDate);
-    const dateWidth =
-      fontRegular.widthOfTextAtSize(dateLabel, 10) +
-      fontRegular.widthOfTextAtSize(dateValue, 10);
+    const dateSize = 10;
 
-    let dateX = width - 86 - dateWidth;
-    if (dateX < width / 2 + 120) {
-      dateX = width / 2 + 120;
-    }
+    const dateWidth =
+      fontRegular.widthOfTextAtSize(dateLabel, dateSize) +
+      fontRegular.widthOfTextAtSize(dateValue, dateSize);
+
+    const dateX = width - 92 - dateWidth;
 
     page.drawText(dateLabel, {
       x: dateX,
-      y: 52,
-      size: 10,
+      y: 54,
+      size: dateSize,
       font: fontRegular,
-      color: bodyText,
+      color: softGray,
     });
 
     page.drawText(dateValue, {
-      x: dateX + fontRegular.widthOfTextAtSize(dateLabel, 10),
-      y: 52,
-      size: 10,
+      x: dateX + fontRegular.widthOfTextAtSize(dateLabel, dateSize),
+      y: 54,
+      size: dateSize,
       font: fontRegular,
-      color: bodyText,
+      color: softGray,
     });
 
     const pdfBytes = await pdfDoc.save();
