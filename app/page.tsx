@@ -67,7 +67,7 @@ export default async function Home({
                     Ejemplo de código
                   </p>
                   <p className="mt-3 rounded-xl bg-slate-950 px-4 py-3 font-mono text-sm text-white shadow-sm">
-                    CEDULL-20XX-XXXXXX
+                    CEDULL-2026-ADEWSF
                   </p>
                 </div>
               </div>
