@@ -39,7 +39,7 @@ export default async function VerifyByUrl({
                 </span>
               </h1>
 
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+              <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
                 Esta página confirma si el certificado consultado existe en el
                 sistema institucional de CEDULL.
               </p>
