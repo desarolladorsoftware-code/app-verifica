@@ -257,7 +257,7 @@ export async function GET(
     });
 
     // Logo arriba derecha
-    const logoDims = logoImage.scale(0.20);
+    const logoDims = logoImage.scale(0.05);
     page.drawImage(logoImage, {
       x: width - logoDims.width - 52,
       y: height - 88,
