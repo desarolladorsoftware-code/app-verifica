@@ -260,12 +260,12 @@ export async function GET(
         logoTop: 70,
         logoScale: 0.350,
 
-        institutionalTextY: height - 92,
-        titleY: height - 148,
-        titleUnderlineY: height - 156,
-        subtitleY: height - 188,
-        nameY: height - 235,
-        nameUnderlineY: height - 244,
+        institutionalTextY: height - 82,
+        titleY: height - 138,
+        titleUnderlineY: height - 146,
+        subtitleY: height - 178,
+        nameY: height - 225,
+        nameUnderlineY: height - 234,
       },
 
       body: {
