@@ -258,7 +258,7 @@ export async function GET(
       header: {
         logoRight: 52,
         logoTop: 70,
-        logoScale: 0.999,
+        logoScale: 0.499,
 
         institutionalTextY: height - 92,
         titleY: height - 148,
