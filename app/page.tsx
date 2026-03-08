@@ -67,14 +67,8 @@ export default async function Home({
                     Ejemplo de código
                   </p>
                   <p className="mt-3 rounded-xl bg-slate-950 px-4 py-3 font-mono text-sm text-white shadow-sm">
-                    CEDULL-2026-AB12CD
+                    CEDULL-20XX-XXXXXX
                   </p>
-                  <p className="mt-4 text-sm leading-6 text-slate-600">
-                    También puedes abrir directamente la URL pública del QR con el formato:
-                  </p>
-                  <div className="mt-3 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2 font-mono text-sm text-slate-700">
-                    /c/{"{codigo}"}
-                  </div>
                 </div>
               </div>
             </div>
@@ -95,7 +89,7 @@ export default async function Home({
               >
                 <Input
                   name="code"
-                  placeholder="CEDULL-2026-XXXXXX"
+                  placeholder="CEDULL-20XX-XXXXXX"
                   defaultValue={code}
                 />
                 <Button type="submit" className="sm:w-44">
