@@ -246,7 +246,7 @@ export async function GET(
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontTitle = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-    const fontName = await pdfDoc.embedFont(StandardFonts.TimesItalic);
+    const fontName = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
 
     const logoImage = await pdfDoc.embedPng(logoBytes);
     const signatureImage = await pdfDoc.embedPng(signatureBytes);
