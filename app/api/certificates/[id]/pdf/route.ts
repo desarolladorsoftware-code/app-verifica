@@ -282,11 +282,11 @@ export async function GET(
         codeX: 64,
         codeY: 46,
 
-        signatureY: 74,
-        signatureScale: 0.215,
-        signatureLineY: 80,
-        signerNameY: 60,
-        signerRoleY: 50,
+        signatureY: 85,
+        signatureScale: 0.220,
+        signatureLineY: 85,
+        signerNameY: 70,
+        signerRoleY: 55,
 
         dateCenterX: width - 94,
         dateLabelY: 62,
